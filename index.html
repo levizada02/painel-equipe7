@@ -1,0 +1,728 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel da Equipe 7</title>
+<style>
+  :root {
+    --bg: #f4f7f5; --surface: #ffffff; --surface-2: #eef3f0; --ink: #14211c; --muted: #5b6b64; --line: #dce4df;
+    --brand: #0b3d2e; --brand-ink: #ffffff; --accent: #f2c230; --accent-ink: #0b3d2e;
+    --p1: #1d4ed8; --p1s: #e8eefc; --p2: #047857; --p2s: #e3f4ee; --p3: #b45309; --p3s: #fbf0e3; --p4: #6d28d9; --p4s: #efe8fb;
+    --warn: #9b1c1c; --warns: #fde2e2; --note: #fff7dc; --note-line: #f0d98a;
+    --shadow: 0 1px 2px rgba(16,40,30,.06), 0 4px 14px rgba(16,40,30,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1613; --surface: #17201c; --surface-2: #1e2a25; --ink: #e6eee9; --muted: #9aaba3; --line: #2a3832;
+      --brand: #0e4a37; --p1: #7aa2ff; --p1s: #1b2747; --p2: #4fd1a5; --p2s: #133229; --p3: #f0a75a; --p3s: #3a2814; --p4: #b79bff; --p4s: #2a1f45;
+      --warn: #ff9b9b; --warns: #3d1a1a; --note: #2c2814; --note-line: #5a4e1f; --shadow: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f1613; --surface: #17201c; --surface-2: #1e2a25; --ink: #e6eee9; --muted: #9aaba3; --line: #2a3832;
+    --brand: #0e4a37; --p1: #7aa2ff; --p1s: #1b2747; --p2: #4fd1a5; --p2s: #133229; --p3: #f0a75a; --p3s: #3a2814; --p4: #b79bff; --p4s: #2a1f45;
+    --warn: #ff9b9b; --warns: #3d1a1a; --note: #2c2814; --note-line: #5a4e1f; --shadow: none;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif; }
+  a { color: inherit; }
+  button { font: inherit; color: inherit; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+
+  /* HEADER */
+  header.hero { background: var(--brand); color: var(--brand-ink); position: relative; overflow: hidden; }
+  header.hero::after { content: ""; position: absolute; right: -90px; top: -90px; width: 300px; height: 300px; border-radius: 50%; border: 36px solid rgba(242,194,48,.16); pointer-events: none; }
+  .hero-in { padding-top: 28px; padding-bottom: 22px; position: relative; z-index: 1; }
+  .tag { display: inline-block; background: var(--accent); color: var(--accent-ink); font-weight: 700; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; padding: 3px 10px; border-radius: 99px; }
+  .hero h1 { font-size: clamp(22px, 3.4vw, 32px); line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.3px; max-width: 760px; }
+  .hero p { margin: 0; opacity: .85; }
+  .theme-btn { position: absolute; right: 0; top: 26px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.25); color: #fff; border-radius: 8px; padding: 5px 10px; cursor: pointer; font-size: 13px; }
+
+  /* NAV */
+  nav.tabs { position: sticky; top: 0; z-index: 10; background: var(--surface); border-bottom: 1px solid var(--line); box-shadow: var(--shadow); }
+  .tabs-in { display: flex; gap: 4px; overflow-x: auto; padding: 8px 0; scrollbar-width: thin; }
+  .tab { flex: none; border: 1px solid transparent; background: none; padding: 7px 13px; border-radius: 99px; cursor: pointer; font-size: 14px; color: var(--muted); white-space: nowrap; display: inline-flex; align-items: center; gap: 7px; }
+  .tab:hover { background: var(--surface-2); color: var(--ink); }
+  .tab[aria-selected="true"] { background: var(--ink); color: var(--bg); font-weight: 600; }
+  .tab .sw { width: 9px; height: 9px; border-radius: 50%; }
+  .tab .pct { font-size: 11px; opacity: .8; font-variant-numeric: tabular-nums; }
+
+  main.wrap { padding-top: 24px; padding-bottom: 60px; }
+  .panel { display: none; }
+  .panel.on { display: block; animation: fade .18s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  h2 { font-size: 22px; margin: 0 0 4px; letter-spacing: -.2px; }
+  h3 { font-size: 16px; margin: 0 0 10px; }
+  .lead { color: var(--muted); margin: 0 0 18px; max-width: 760px; }
+  .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 1.1px; text-transform: uppercase; color: var(--muted); margin: 26px 0 10px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
+
+  /* OVERVIEW */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .stat { padding: 14px 16px; }
+  .stat b { display: block; font-size: 22px; color: var(--brand); line-height: 1.1; }
+  :root[data-theme="dark"] .stat b { color: var(--accent); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .stat b { color: var(--accent); } }
+  .stat span { font-size: 13px; color: var(--muted); }
+  .flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1.3fr auto 1fr; gap: 10px; align-items: stretch; }
+  .flow .arr { display: flex; align-items: center; color: var(--muted); font-size: 20px; }
+  .fbox { padding: 12px 14px; font-size: 14px; }
+  .fbox b { display: block; margin-bottom: 4px; }
+  .fbox ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 13px; }
+  .fbox.p1b { border-color: var(--p1); background: var(--p1s); }
+  .fbox.out { background: var(--brand); color: #fff; border-color: var(--brand); }
+  .fbox.out ul { color: rgba(255,255,255,.85); }
+  .stack { display: grid; gap: 8px; }
+  .mini { padding: 9px 12px; font-size: 13px; border-left: 5px solid; cursor: pointer; text-align: left; background: var(--surface); border-top: 1px solid var(--line); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); border-radius: 8px; }
+  .mini:hover { background: var(--surface-2); }
+  .rules { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .rule { padding: 14px; display: grid; grid-template-columns: 32px 1fr; gap: 10px; }
+  .num { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  .rule b { display: block; font-size: 14px; } .rule span { font-size: 13px; color: var(--muted); }
+  .seq { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; counter-reset: s; }
+  .seq div { padding: 12px 14px; font-size: 13px; color: var(--muted); border-top: 4px solid var(--brand); }
+  .seq b { display: block; color: var(--ink); font-size: 14px; }
+  .roles-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .rolecard { padding: 0; overflow: hidden; cursor: pointer; text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; box-shadow: var(--shadow); transition: transform .12s; }
+  .rolecard:hover { transform: translateY(-2px); }
+  .rolecard .hd { padding: 12px 14px; color: #fff; }
+  .rolecard .hd small { font-weight: 700; letter-spacing: 1px; opacity: .9; }
+  .rolecard .hd div { font-weight: 700; font-size: 16px; line-height: 1.2; }
+  .rolecard .bd { padding: 12px 14px; font-size: 13px; color: var(--muted); }
+  .bar { height: 6px; background: var(--surface-2); border-radius: 99px; overflow: hidden; margin-top: 10px; }
+  .bar i { display: block; height: 100%; width: 0; border-radius: 99px; transition: width .25s; }
+  .report { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .rs { padding: 10px 12px; border-top: 4px solid; font-size: 13px; }
+  .rs b { display: block; font-size: 14px; } .rs span { color: var(--muted); }
+  .legend { display: flex; gap: 14px; font-size: 13px; color: var(--muted); margin-bottom: 10px; flex-wrap: wrap; }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+
+  /* ROLE PANEL */
+  .rhead { border-radius: 14px; color: #fff; padding: 20px 22px; display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; }
+  .rhead small { font-weight: 700; letter-spacing: 1.2px; opacity: .9; }
+  .rhead h2 { color: #fff; font-size: 26px; }
+  .rhead p { margin: 4px 0 0; opacity: .9; max-width: 640px; }
+  .ring { width: 92px; height: 92px; position: relative; }
+  .ring svg { transform: rotate(-90deg); }
+  .ring span { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 700; font-size: 20px; line-height: 1; }
+  .ring span small { font-size: 11px; font-weight: 500; opacity: .85; margin-top: 3px; letter-spacing: 0; }
+  .cols { display: grid; grid-template-columns: 1.35fr 1fr; gap: 16px; margin-top: 16px; align-items: start; }
+  .tasks { padding: 6px 0; }
+  .task { display: grid; grid-template-columns: 22px 1fr; gap: 10px; padding: 9px 16px; cursor: pointer; align-items: start; border-bottom: 1px solid var(--line); }
+  .task:last-child { border-bottom: 0; }
+  .task:hover { background: var(--surface-2); }
+  .task input { width: 18px; height: 18px; margin: 2px 0 0; cursor: pointer; }
+  .task.done span { color: var(--muted); text-decoration: line-through; }
+  .task .lnk { font-size: 12px; margin-left: 6px; }
+  .side { display: grid; gap: 12px; }
+  .side .card { padding: 14px 16px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { font-size: 12.5px; padding: 3px 10px; border-radius: 99px; background: var(--surface-2); border: 1px solid var(--line); white-space: nowrap; }
+  .kv { display: grid; grid-template-columns: 110px 1fr; gap: 6px 10px; font-size: 14px; }
+  .kv dt { color: var(--muted); } .kv dd { margin: 0; }
+  .list-links { margin: 0; padding-left: 18px; font-size: 14px; }
+  .list-links li { margin: 3px 0; }
+  .reset { background: none; border: 1px solid var(--line); border-radius: 8px; padding: 5px 10px; font-size: 13px; color: var(--muted); cursor: pointer; }
+  .reset:hover { color: var(--ink); }
+  .taskhead { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px 6px; }
+
+  /* SOURCES */
+  .filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; align-items: center; }
+  .fbtn { border: 1px solid var(--line); background: var(--surface); padding: 5px 12px; border-radius: 99px; cursor: pointer; font-size: 13px; display: inline-flex; gap: 6px; align-items: center; }
+  .fbtn[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .search { flex: 1; min-width: 180px; max-width: 320px; padding: 7px 12px; border-radius: 99px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; font-size: 14px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .src { padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+  .src.main { border: 2px solid var(--brand); }
+  .src .top { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+  .src .name { font-weight: 700; }
+  .src .what { font-size: 13.5px; color: var(--muted); flex: 1; }
+  .src a.go { font-size: 13.5px; color: var(--p1); text-decoration: none; font-weight: 600; }
+  .src a.go:hover { text-decoration: underline; }
+  .badge { font-size: 10.5px; font-weight: 700; letter-spacing: .7px; text-transform: uppercase; background: var(--accent); color: var(--accent-ink); padding: 2px 7px; border-radius: 5px; white-space: nowrap; }
+  .badge.warn { background: var(--warns); color: var(--warn); }
+  .owners { display: flex; gap: 4px; flex-wrap: wrap; }
+  .own { font-size: 11px; font-weight: 700; color: #fff; border-radius: 5px; padding: 1px 6px; }
+  :root[data-theme="dark"] .own { color: #0f1613; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .own { color: #0f1613; } }
+  .own.all { background: var(--muted); }
+
+  /* ARTICLES */
+  .arts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .art { padding: 12px 14px 12px 16px; border-left: 5px solid; }
+  .art .a { font-weight: 700; }
+  .art .j { color: var(--muted); font-style: italic; font-size: 13.5px; }
+  .art .u { font-size: 14px; margin: 4px 0 8px; }
+  .art .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .art .row a, .art .row button { font-size: 12.5px; border: 1px solid var(--line); background: var(--surface-2); border-radius: 7px; padding: 3px 9px; cursor: pointer; text-decoration: none; }
+  .art .row a:hover, .art .row button:hover { border-color: var(--muted); }
+  .art details { margin-top: 8px; font-size: 12.5px; color: var(--muted); }
+  .art details summary { cursor: pointer; }
+  .art details p { margin: 6px 0 0; padding: 8px 10px; background: var(--surface-2); border-radius: 8px; color: var(--ink); }
+  .flag { font-size: 10.5px; font-weight: 700; color: var(--warn); background: var(--warns); border-radius: 5px; padding: 1px 6px; margin-left: 6px; letter-spacing: .4px; vertical-align: 1px; }
+  .empty { color: var(--muted); padding: 20px; text-align: center; }
+
+  /* RESEARCH */
+  .portals { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .portal { display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: center; padding: 12px 14px; text-decoration: none; }
+  .portal:hover { border-color: var(--muted); }
+  .rk { width: 34px; height: 34px; border-radius: 8px; background: var(--brand); color: var(--accent); font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  .portal b { display: block; } .portal span { font-size: 13px; color: var(--muted); }
+  .terms { display: flex; flex-wrap: wrap; gap: 8px; }
+  .term { font: 13px Consolas, "Courier New", monospace; background: var(--note); border: 1px solid var(--note-line); border-radius: 7px; padding: 5px 10px; cursor: pointer; color: var(--ink); }
+  .term:hover { border-color: var(--muted); }
+  .course { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .cc { border-radius: 12px; padding: 12px 14px; font-size: 13.5px; }
+  .cc b { display: block; margin-bottom: 4px; }
+  .cc ul { margin: 0; padding-left: 17px; }
+  .callout { background: var(--note); border: 1px solid var(--note-line); border-radius: 12px; padding: 14px 16px; font-size: 14px; }
+
+  /* DRIVE */
+  .drive { display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px; align-items: start; }
+  .tree { padding: 14px 8px; }
+  .node { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 8px; text-decoration: none; font-size: 14px; }
+  a.node:hover { background: var(--surface-2); }
+  .node .ic { width: 22px; height: 18px; flex: none; }
+  .node small { color: var(--muted); margin-left: auto; font-size: 12px; text-align: right; }
+  .d1 { padding-left: 34px; } .d2 { padding-left: 58px; } .d3 { padding-left: 82px; }
+  .where { padding: 16px 18px; }
+  .where ol { margin: 0; padding-left: 20px; } .where li { margin: 6px 0; font-size: 14px; }
+
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); background: var(--ink); color: var(--bg); padding: 9px 16px; border-radius: 10px; font-size: 14px; opacity: 0; transition: .2s; pointer-events: none; z-index: 50; }
+  .toast.on { opacity: 1; transform: translateX(-50%); }
+  footer { color: var(--muted); font-size: 12.5px; padding: 18px 0 30px; border-top: 1px solid var(--line); }
+
+  @media (max-width: 900px) {
+    .stats, .roles-grid, .report, .course { grid-template-columns: repeat(2, 1fr); }
+    .rules, .grid3 { grid-template-columns: repeat(2, 1fr); }
+    .flow { grid-template-columns: 1fr; } .flow .arr { justify-content: center; transform: rotate(90deg); }
+    .cols, .drive { grid-template-columns: 1fr; }
+    .seq { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 620px) {
+    body { font-size: 14px; }
+    .stats, .rules, .grid3, .arts, .portals, .report, .course, .seq { grid-template-columns: 1fr; }
+    .roles-grid { grid-template-columns: 1fr 1fr; }
+    .rhead { grid-template-columns: 1fr; } .ring { width: 76px; height: 76px; }
+    .theme-btn { top: 12px; }
+    .kv { grid-template-columns: 1fr; } .kv dt { margin-top: 6px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap hero-in">
+    <button class="theme-btn" id="themeBtn" title="Alternar tema claro/escuro">◐ Tema</button>
+    <span class="tag">Painel da Equipe 7</span>
+    <h1>Análise Econômico-Financeira da Petrobras com BI e Big Data</h1>
+    <p>Finanças Empresariais · Engenharia de Produção · Período analisado: 2021–2025</p>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="Seções do painel">
+  <div class="wrap tabs-in" role="tablist" id="tabs"></div>
+</nav>
+
+<main class="wrap">
+
+  <!-- VISÃO GERAL -->
+  <section class="panel" id="inicio" role="tabpanel">
+    <h2>Como vamos trabalhar</h2>
+    <p class="lead">Cada pessoa é dona de uma frente, do dado ao slide. Clique na sua função para ver o checklist, as fontes e as leituras. As tarefas que você marcar ficam salvas neste navegador.</p>
+    <div class="stats">
+      <div class="card stat"><b>4 frentes</b><span>cada pessoa cuida de uma, de ponta a ponta</span></div>
+      <div class="card stat"><b>3 entregas</b><span>relatório · painel Streamlit · apresentação</span></div>
+      <div class="card stat"><b>~5 páginas</b><span>de relatório e ~4 min de fala por pessoa</span></div>
+      <div class="card stat"><b>23 artigos</b><span>já separados por função, com link</span></div>
+    </div>
+
+    <div class="eyebrow">Escolha sua função</div>
+    <div class="roles-grid" id="roleCards"></div>
+
+    <div class="eyebrow">Como o trabalho flui</div>
+    <div class="flow">
+      <div class="card fbox"><b>Fontes públicas</b><ul><li>DFP da CVM</li><li>RI Petrobras</li><li>Banco Central</li><li>Brent (FRED)</li></ul></div>
+      <div class="arr">→</div>
+      <div class="card fbox p1b"><b style="color:var(--p1)">P1 · Base tratada</b><ul><li>Petrobras consolidada</li><li>Corrigida pelo IGP-M (base 2025)</li><li>BP e DRE com AV/AH</li></ul></div>
+      <div class="arr">→</div>
+      <div class="stack">
+        <button class="mini" style="border-left-color:var(--p2)" data-go="p2"><b>P2</b> · DRE, rentabilidade e análise Big Data</button>
+        <button class="mini" style="border-left-color:var(--p3)" data-go="p3"><b>P3</b> · Liquidez, endividamento e capital de giro</button>
+        <button class="mini" style="border-left-color:var(--p4)" data-go="p4"><b>P4</b> · Contexto, referencial, valor e edição</button>
+      </div>
+      <div class="arr">→</div>
+      <div class="card fbox out"><b>Entregas</b><ul><li>Relatório (PDF)</li><li>App Streamlit</li><li>Slides</li></ul></div>
+    </div>
+
+    <div class="eyebrow">Ordem das entregas</div>
+    <div class="seq">
+      <div class="card"><b>1 · Base de dados</b>BP e DRE corrigidos, publicados no Drive</div>
+      <div class="card"><b>2 · Indicadores</b>calculados e conferidos com o release</div>
+      <div class="card"><b>3 · Rascunho completo</b>todas as seções + revisão cruzada</div>
+      <div class="card"><b>4 · Versão final</b>PDF em ABNT, app publicado, slides</div>
+    </div>
+
+    <div class="eyebrow">Regras para funcionar sem reunião</div>
+    <div class="rules">
+      <div class="card rule"><div class="num">1</div><div><b>Escolha sua frente</b><span>Avise no grupo qual função quer. Quem falar primeiro fica com ela.</span></div></div>
+      <div class="card rule"><div class="num">2</div><div><b>Ninguém espera ninguém</b><span>P2 e P3 começam pela Central de Resultados; P4 começa pelo texto.</span></div></div>
+      <div class="card rule"><div class="num">3</div><div><b>Padrões fixos</b><span>R$ milhões · consolidado · IGP-M base 2025 · fonte abaixo de toda figura.</span></div></div>
+      <div class="card rule"><div class="num">4</div><div><b>Revisão cruzada</b><span>P1 revisa P2 → P2 revisa P3 → P3 revisa P4 → P4 revisa P1.</span></div></div>
+      <div class="card rule"><div class="num">5</div><div><b>Tudo no Drive</b><span>Artigos em Nosso Trabalho/Artigos; texto no Relatório Rasc.</span></div></div>
+      <div class="card rule"><div class="num">6</div><div><b>Conferir antes de entregar</b><span>Ativo = Passivo + PL em todo ano; lucro igual ao do release.</span></div></div>
+    </div>
+
+    <div class="eyebrow">Estrutura do relatório · quem escreve o quê</div>
+    <div class="legend"><span><i class="dot" style="background:var(--p1)"></i>P1</span><span><i class="dot" style="background:var(--p2)"></i>P2</span><span><i class="dot" style="background:var(--p3)"></i>P3</span><span><i class="dot" style="background:var(--p4)"></i>P4</span></div>
+    <div class="report" id="report"></div>
+  </section>
+
+  <!-- ROLE PANELS -->
+  <section class="panel" id="p1" role="tabpanel"></section>
+  <section class="panel" id="p2" role="tabpanel"></section>
+  <section class="panel" id="p3" role="tabpanel"></section>
+  <section class="panel" id="p4" role="tabpanel"></section>
+
+  <!-- FONTES -->
+  <section class="panel" id="fontes" role="tabpanel">
+    <h2>Fontes de dados</h2>
+    <p class="lead">A DFP da CVM é a fonte principal e oficial. As demais servem para contexto, correção monetária e conferência. Filtre pela sua função.</p>
+    <div class="filters" id="srcFilters"></div>
+    <div class="grid3" id="srcGrid"></div>
+    <div class="eyebrow">Pares para comparação</div>
+    <div class="chips"><span class="chip">PRIO (Brasil)</span><span class="chip">Shell</span><span class="chip">Equinor</span><span class="chip">Ecopetrol</span><span class="chip">BP</span><span class="chip">ExxonMobil</span></div>
+  </section>
+
+  <!-- ARTIGOS -->
+  <section class="panel" id="artigos" role="tabpanel">
+    <h2>Artigos acadêmicos</h2>
+    <p class="lead">23 artigos separados por função. Abra o link para ler e use "Copiar ABNT" para colar a referência pronta no relatório. Os marcados <span class="flag">CONFERIR</span> tiveram DOI ou autoria não confirmados: cheque na fonte antes de citar.</p>
+    <div class="filters" id="artFilters"></div>
+    <div class="arts" id="artGrid"></div>
+  </section>
+
+  <!-- PESQUISA -->
+  <section class="panel" id="pesquisa" role="tabpanel">
+    <h2>Onde pesquisar mais</h2>
+    <p class="lead">Comece pelos slides do curso (base das fórmulas) e pelos artigos da aba anterior. Para achar mais, siga os portais na ordem abaixo.</p>
+    <div class="eyebrow" style="margin-top:0">Material do curso · capítulos por função</div>
+    <div class="course">
+      <div class="cc" style="background:var(--p1s)"><b style="color:var(--p1)">P1</b><ul><li>Martins, Miranda &amp; Diniz, cap. 2: estrutura das demonstrações</li><li>Cap. 4: análise vertical e horizontal</li></ul></div>
+      <div class="cc" style="background:var(--p2s)"><b style="color:var(--p2)">P2</b><ul><li>Martins et al., cap. 9: rentabilidade e EBITDA</li><li>Ferrari: quocientes de rentabilidade</li><li>Assaf Neto: ROI e alavancagem</li></ul></div>
+      <div class="cc" style="background:var(--p3s)"><b style="color:var(--p3)">P3</b><ul><li>Martins et al., caps. 5 a 8: liquidez, estrutura, capital de giro, atividade</li><li>Ferrari: endividamento e rotatividade</li></ul></div>
+      <div class="cc" style="background:var(--p4s)"><b style="color:var(--p4)">P4</b><ul><li>Martins et al., caps. 1, 3 e 10: introdução, método, GVA</li><li>Lei 6.404/76 e pronunciamentos CPC</li></ul></div>
+    </div>
+    <div class="eyebrow">Portais de busca · em ordem de prioridade</div>
+    <div class="portals" id="portals"></div>
+    <div class="eyebrow">Termos de busca · clique para copiar</div>
+    <div class="terms" id="terms"></div>
+    <div class="eyebrow">Atenção</div>
+    <div class="callout"><b>Lacuna:</b> não existe artigo revisado por pares sobre a Petrobras em 2021–2025 nem sobre o fim da paridade de preços internacional (PPI) em 2023. Para esse período, usem os relatórios da Petrobras e os textos do <a href="https://www.ipea.gov.br/" target="_blank" rel="noopener">IPEA</a> e da EPE como <b>fonte de dados e contexto</b>. A base teórica vem dos artigos acadêmicos.</div>
+  </section>
+
+  <!-- DRIVE -->
+  <section class="panel" id="drive" role="tabpanel">
+    <h2>Pasta da equipe no Google Drive</h2>
+    <p class="lead">Clique em qualquer pasta para abrir no Drive.</p>
+    <div class="drive">
+      <div class="card tree" id="tree"></div>
+      <div class="card where">
+        <h3>Onde colocar cada coisa</h3>
+        <ol>
+          <li><b>Artigos baixados</b> → Nosso Trabalho/Artigos</li>
+          <li><b>Texto de cada seção</b> → Relatório Rasc, no lugar da sua seção</li>
+          <li><b>Planilhas e base tratada</b> → crie Nosso Trabalho/Dados</li>
+          <li><b>Slides</b> → crie Nosso Trabalho/Apresentação</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <footer>Painel da Equipe 7 · Finanças Empresariais · As tarefas marcadas ficam salvas só neste navegador; avise no grupo quando concluir algo importante.</footer>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- storage (safe) ---------- */
+  var KEY = "equipe7-painel-v1";
+  function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
+  function save(s) { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} }
+  var state = load();
+  state.done = state.done || {};
+
+  /* ---------- data ---------- */
+  var ROLES = {
+    p1: { n: "P1", name: "Dados & Balanço", color: "var(--p1)", soft: "var(--p1s)",
+      pitch: "Constrói a base de dados que todo mundo usa e cuida da análise do Balanço e da estrutura do app.",
+      sections: "3 Metodologia · 4 Balanço · 8 Painel", app: "Página Balanço + esqueleto do app", reviews: "P2",
+      indicators: ["AV/AH do Balanço", "Ativo, Passivo e PL corrigidos"],
+      tasks: [
+        ["Baixar a DFP 2021–2025 da CVM", "https://dados.cvm.gov.br/"],
+        ["Filtrar a Petrobras: CD_CVM 9512, consolidado, ORDEM_EXERC = \"ÚLTIMO\""],
+        ["Baixar o IGP-M (série 189) pela API do Banco Central", "https://www3.bcb.gov.br/sgspub/"],
+        ["Corrigir BP e DRE de 2021–2024 para a base 2025"],
+        ["Conferir Ativo = Passivo + PL em todos os anos"],
+        ["Publicar a base tratada no Drive (Nosso Trabalho/Dados)"],
+        ["Fazer a AV/AH do Balanço e comentar cada grupo de contas"],
+        ["Escrever as seções 3 (Metodologia) e 4 (Balanço)"],
+        ["Montar o esqueleto do app Streamlit e a página Balanço"],
+        ["Publicar o app no Streamlit Cloud e escrever a seção 8"],
+        ["Revisar o texto da P2"],
+        ["Montar os slides da sua parte"]
+      ] },
+    p2: { n: "P2", name: "Resultado & Rentabilidade", color: "var(--p2)", soft: "var(--p2s)",
+      pitch: "Analisa a DRE e a rentabilidade e liga os resultados ao preço do petróleo, câmbio e juros (a parte Big Data).",
+      sections: "5 DRE · 6.4 Rentabilidade · 7 Big Data", app: "Páginas DRE e Rentabilidade", reviews: "P3",
+      indicators: ["Margem bruta", "Margem operacional", "Margem líquida", "Margem EBITDA", "Giro do ativo", "ROA", "ROE", "DuPont"],
+      tasks: [
+        ["Começar pelos números da Central de Resultados enquanto a base do P1 não sai", "https://www.investidorpetrobras.com.br/"],
+        ["Fazer a AV/AH da DRE"],
+        ["Calcular as margens bruta, operacional, líquida e EBITDA (recalcular o EBITDA)"],
+        ["Calcular giro do ativo, ROA, ROE e a decomposição DuPont"],
+        ["Coletar o Brent no FRED", "https://fred.stlouisfed.org/series/DCOILBRENTEU"],
+        ["Coletar câmbio (PTAX) e Selic no Banco Central", "https://www3.bcb.gov.br/sgspub/"],
+        ["Cruzar Brent e câmbio com receita e margem em gráficos"],
+        ["Contextualizar a política de preços (fim do PPI em 2023) e de dividendos"],
+        ["Escrever as seções 5, 6.4 e 7"],
+        ["Montar as páginas DRE e Rentabilidade no app"],
+        ["Revisar o texto da P3"],
+        ["Montar os slides da sua parte"]
+      ] },
+    p3: { n: "P3", name: "Liquidez, Estrutura & Giro", color: "var(--p3)", soft: "var(--p3s)",
+      pitch: "Mede a saúde financeira de curto e longo prazo e compara a Petrobras com outras petroleiras.",
+      sections: "6.1 Liquidez · 6.2 Estrutura · 6.3 Giro", app: "Página Liquidez e Estrutura", reviews: "P4",
+      indicators: ["Liquidez corrente", "Seca", "Imediata", "Geral", "Capital de terceiros", "Composição do endividamento", "Dívida Líq./EBITDA", "Prazos médios", "Ciclos", "CCL e NCG"],
+      tasks: [
+        ["Começar pelos números da Central de Resultados enquanto a base do P1 não sai", "https://www.investidorpetrobras.com.br/"],
+        ["Calcular liquidez corrente, seca, imediata e geral"],
+        ["Calcular participação de capital de terceiros, composição do endividamento e imobilização do PL"],
+        ["Calcular Dívida Líquida/EBITDA com e sem arrendamentos (IFRS 16)"],
+        ["Calcular prazos médios (PMRE, PMRV, PMPF) e ciclos operacional e financeiro"],
+        ["Calcular CCL e NCG (modelo Fleuriet)"],
+        ["Montar a tabela de comparação com pares (PRIO, Shell, Equinor, Ecopetrol) e setor"],
+        ["Escrever as seções 6.1, 6.2 e 6.3"],
+        ["Montar a página Liquidez e Estrutura no app"],
+        ["Revisar o texto da P4"],
+        ["Montar os slides da sua parte"]
+      ] },
+    p4: { n: "P4", name: "Contexto, Valor & Edição", color: "var(--p4)", soft: "var(--p4s)",
+      pitch: "Escreve a abertura e a base teórica, calcula os indicadores de valor e fecha o trabalho como editor final.",
+      sections: "1 · 2 · 6.5 · 9 Conclusão · 10 Referências", app: "Home (resumo dos KPIs)", reviews: "P1",
+      indicators: ["Crescimento de vendas", "Riqueza/empregado (DVA)", "Payout", "Dividendos", "GVA"],
+      tasks: [
+        ["Escrever a Introdução: história, segmentos, setor e contexto 2021–2025"],
+        ["Escrever o Referencial teórico (demonstrações, índices, BI e Big Data)"],
+        ["Calcular o crescimento de vendas"],
+        ["Calcular riqueza por empregado (DVA + nº de empregados do Formulário de Referência)", "https://www.investidorpetrobras.com.br/"],
+        ["Calcular payout, dividendos e GVA"],
+        ["Escrever a seção 6.5"],
+        ["Montar a Home do app (resumo dos KPIs)"],
+        ["Revisar o texto da P1"],
+        ["Escrever a Conclusão consolidada (seção 9)"],
+        ["Organizar Referências em ABNT e anexos (seção 10)"],
+        ["Fazer a formatação final do relatório e montar os slides"]
+      ] }
+  };
+
+  var REPORT = [
+    ["1 · Introdução", "Petrobras, setor, contexto", "p4"], ["2 · Referencial", "Demonstrações, índices, BI", "p4"],
+    ["3 · Metodologia", "Fontes, fluxo, IGP-M", "p1"], ["4 · Balanço", "Original × corrigido, AV/AH", "p1"],
+    ["5 · DRE", "AV/AH, EBITDA, lucro", "p2"], ["6.1–6.3 · Liquidez e giro", "Estrutura e capital de giro", "p3"],
+    ["6.4 · Rentabilidade", "Margens, ROA, ROE, DuPont", "p2"], ["6.5 · Valor", "Crescimento, payout, GVA", "p4"],
+    ["7 · Big Data", "Brent, câmbio × resultado", "p2"], ["8 · Painel", "Prints + link do app", "p1"],
+    ["9 · Conclusão", "Síntese das 4 frentes", "p4"], ["10 · Referências", "ABNT + anexos BP/DRE", "p4"]
+  ];
+
+  var SOURCES = [
+    { name: "CVM Dados Abertos", main: true, what: "DFP 2021–2025 em CSV. Filtro: Petrobras CD_CVM 9512, consolidado, ORDEM_EXERC = \"ÚLTIMO\". Base de todos.", who: ["p1"], url: "https://dados.cvm.gov.br/", host: "dados.cvm.gov.br" },
+    { name: "Petrobras RI", what: "Central de Resultados (planilhas), Relatório da Administração, DVA, Formulário de Referência (nº de empregados).", who: ["p1", "p2", "p3", "p4"], url: "https://www.investidorpetrobras.com.br/", host: "investidorpetrobras.com.br" },
+    { name: "Banco Central · SGS", what: "IGP-M (série 189), IPCA (433), Selic (432), dólar PTAX (1). Tem API gratuita.", who: ["p1", "p2"], url: "https://www3.bcb.gov.br/sgspub/", host: "www3.bcb.gov.br/sgspub" },
+    { name: "FRED · Brent", what: "Preço diário do petróleo Brent (série DCOILBRENTEU) para a análise Big Data.", who: ["p2"], url: "https://fred.stlouisfed.org/series/DCOILBRENTEU", host: "fred.stlouisfed.org" },
+    { name: "ANP", what: "Produção de petróleo e gás e preços de combustíveis no Brasil.", who: ["p2", "p4"], url: "https://www.gov.br/anp/", host: "gov.br/anp" },
+    { name: "SEC · Form 20-F", what: "Relatório anual em inglês: segmentos de negócio e fatores de risco.", who: ["p4"], url: "https://www.sec.gov/edgar/search/", host: "sec.gov/edgar" },
+    { name: "Valor 1000 · Exame M&M", what: "Médias do setor para comparar os índices, como nos trabalhos de exemplo.", who: ["p3"], url: "", host: "anuários Valor 1000 e Exame Melhores e Maiores" },
+    { name: "B3 · yfinance", what: "Cotações e proventos de PETR3 e PETR4 para payout e dividendos.", who: ["p4"], url: "https://www.b3.com.br/", host: "b3.com.br" },
+    { name: "Status Invest · Fundamentus", warn: true, what: "Para checar se os índices calculados batem. Nunca citar como fonte no relatório.", who: ["p1", "p2", "p3", "p4"], url: "https://statusinvest.com.br/acoes/petr4", host: "statusinvest.com.br" }
+  ];
+
+  var ARTS = [
+    { r: "p1", a: "De Rossi & Schmidt (2011)", j: "ConTexto", u: "XBRL e dados padronizados: por que usar a DFP da CVM", url: "https://seer.ufrgs.br/index.php/ConTexto/article/view/18221",
+      abnt: "DE ROSSI, Thomas; SCHMIDT, Paulo. Teoria e prática para a adoção do XBRL – Extensible Business Reporting Language. ConTexto, Porto Alegre, v. 11, n. 19, p. 43-60, 2011." },
+    { r: "p1", a: "Chen, Chiang & Storey (2012)", j: "MIS Quarterly", u: "Conceito de Business Intelligence & Analytics", url: "https://aisel.aisnet.org/misq/vol36/iss4/16",
+      abnt: "CHEN, Hsinchun; CHIANG, Roger H. L.; STOREY, Veda C. Business intelligence and analytics: from big data to big impact. MIS Quarterly, v. 36, n. 4, p. 1165-1188, 2012." },
+    { r: "p1", a: "Silva et al. (2023)", j: "Rev. Economia e Políticas Públicas", u: "AV/AH e liquidez da Petrobras 2014–2021", url: "https://periodicos.unimontes.br/index.php/economiaepoliticaspublicas/article/view/6228",
+      abnt: "SILVA, João Victor Rodrigues da et al. Análise financeira da Petrobras no contexto dos atos de corrupção expostos na operação Lava Jato. Revista Economia e Políticas Públicas, v. 11, n. 1, p. 100-141, 2023. DOI: 10.46551/20230105." },
+    { r: "p1", a: "Yigitbasioglu & Velcu (2012)", j: "IJAIS", u: "Princípios de design de dashboards", url: "https://doi.org/10.1016/j.accinf.2011.08.002",
+      abnt: "YIGITBASIOGLU, Ogan M.; VELCU, Oana. A review of dashboards in performance management: implications for design and research. International Journal of Accounting Information Systems, v. 13, n. 1, p. 41-59, 2012. DOI: 10.1016/j.accinf.2011.08.002." },
+    { r: "p1", a: "Janvrin, Raschke & Dilla (2014)", j: "J. Accounting Education", u: "Visualização interativa apoia a decisão", url: "https://doi.org/10.1016/j.jaccedu.2014.09.003",
+      abnt: "JANVRIN, Diane J.; RASCHKE, Robyn L.; DILLA, William N. Making sense of complex data using interactive data visualization. Journal of Accounting Education, v. 32, n. 4, p. 31-48, 2014. DOI: 10.1016/j.jaccedu.2014.09.003." },
+
+    { r: "p2", a: "Maragno, Borba & Fey (2014)", j: "Rev. Contabilidade UERJ", u: "Divulgação do EBITDA e por que recalculá-lo", url: "https://www.e-publicacoes.uerj.br/rcmccuerj/article/view/8194",
+      abnt: "MARAGNO, Lucas Martins Dias; BORBA, José Alonso; FEY, Vladimir Arthur. Como as empresas mais negociadas na BM&FBOVESPA divulgam o EBITDA? Revista de Contabilidade do Mestrado em Ciências Contábeis da UERJ, v. 19, n. 1, p. 58-79, 2014." },
+    { r: "p2", a: "Trojan, Danielli & Einsweiller (2020)", j: "Congresso USP", u: "ROA, ROE e endividamento no setor de petróleo", url: "https://congressousp.fipecafi.org/anais/20UspInternational/ArtigosDownload/1937.pdf",
+      abnt: "TROJAN, Débora Anne; DANIELLI, Debora; EINSWEILLER, André Carlos. Folga financeira versus desempenho econômico: um estudo em empresas do setor de petróleo, gás e biocombustíveis listadas na B3. In: CONGRESSO USP DE INICIAÇÃO CIENTÍFICA EM CONTABILIDADE, 17., 2020, São Paulo. Anais [...]. São Paulo: FIPECAFI, 2020." },
+    { r: "p2", a: "Díaz & Pérez de Gracia (2017)", j: "Finance Research Letters", u: "Choques do petróleo × retorno das ações", url: "https://doi.org/10.1016/j.frl.2016.09.010", check: true,
+      abnt: "DÍAZ, E. M.; PÉREZ DE GRACIA, F. Oil price shocks and stock returns of oil and gas corporations. Finance Research Letters, v. 20, p. 75-80, 2017. DOI: 10.1016/j.frl.2016.09.010." },
+    { r: "p2", a: "Mohammadpoor & Torabi (2020)", j: "Petroleum", u: "Big Data analytics no setor de petróleo e gás", url: "https://doi.org/10.1016/j.petlm.2018.11.001",
+      abnt: "MOHAMMADPOOR, Mehdi; TORABI, Farshid. Big Data analytics in oil and gas industry: an emerging trend. Petroleum, v. 6, n. 4, p. 321-328, 2020. DOI: 10.1016/j.petlm.2018.11.001." },
+    { r: "p2", a: "Nguyen, Gosine & Warrian (2020)", j: "IEEE Access", u: "Big Data na indústria de petróleo 4.0 (opcional)", url: "https://archive.munkschool.utoronto.ca/ipl/publication/a-systematic-review-of-big-data-analytics-for-oil-and-gas-industry-4-0", check: true,
+      abnt: "NGUYEN, Trung; GOSINE, Raymond G.; WARRIAN, Peter. A systematic review of big data analytics for oil and gas industry 4.0. IEEE Access, v. 8, p. 61183-61201, 2020." },
+
+    { r: "p3", a: "Brito, Assaf Neto & Corrar (2009)", j: "Rev. Contabilidade & Finanças", u: "Índices contábeis antecipam o default", url: "https://www.revistas.usp.br/rcf/article/view/34299",
+      abnt: "BRITO, Giovani Antonio Silva; ASSAF NETO, Alexandre; CORRAR, Luiz João. Sistema de classificação de risco de crédito: uma aplicação a companhias abertas no Brasil. Revista Contabilidade & Finanças, São Paulo, v. 20, n. 51, p. 28-43, 2009. DOI: 10.1590/S1519-70772009000300003." },
+    { r: "p3", a: "Pereira & Martins (2015)", j: "Rev. Contemporânea de Contabilidade", u: "Revisão dos modelos de previsão de falência", url: "https://periodicos.ufsc.br/index.php/contabilidade/article/view/2175-8069.2015v12n26p163",
+      abnt: "PEREIRA, Vinicius Silva; MARTINS, Vidigal Fernandes. Estudos de previsão de falências: uma revisão das publicações internacionais e brasileiras de 1930 a 2015. Revista Contemporânea de Contabilidade, Florianópolis, v. 12, n. 26, p. 163-196, 2015. DOI: 10.5007/2175-8069.2015v12n26p163." },
+    { r: "p3", a: "Moreira, Franco & Oliveira (2015)", j: "ENEGEP", u: "Termômetros de insolvência aplicados à Petrobras", url: "https://abepro.org.br/biblioteca/TN_STP_208_235_27001.pdf",
+      abnt: "MOREIRA, Tais Vieira; FRANCO, Renata Felix; OLIVEIRA, Sara Mara de Araujo. Avaliação financeira de uma empresa petrolífera por meio de termômetros de insolvências. In: ENCONTRO NACIONAL DE ENGENHARIA DE PRODUÇÃO, 35., 2015, Fortaleza. Anais [...]. Rio de Janeiro: ABEPRO, 2015." },
+    { r: "p3", a: "Ambrozini, Matias & Pimenta Jr. (2014)", j: "Contabilidade Vista & Revista", u: "Modelo Fleuriet de capital de giro", url: "https://revistas.face.ufmg.br/index.php/contabilidadevistaerevista/article/view/1416", check: true,
+      abnt: "AMBROZINI, Marcelo Augusto; MATIAS, Alberto Borges; PIMENTA JUNIOR, Tabajara. Análise dinâmica de capital de giro segundo o Modelo Fleuriet: uma classificação das empresas brasileiras de capital aberto no período de 1996 a 2013. Contabilidade Vista & Revista, Belo Horizonte, v. 25, n. 2, p. 15-37, 2014." },
+    { r: "p3", a: "Wolf (2009)", j: "Energy Policy", u: "Petroleiras estatais × privadas: base para comparar pares", url: "https://ideas.repec.org/p/enp/wpaper/eprg0813.html",
+      abnt: "WOLF, Christian. Does ownership matter? The performance and efficiency of State Oil vs. Private Oil (1987-2006). Energy Policy, v. 37, n. 7, p. 2642-2652, 2009." },
+
+    { r: "p4", a: "Jesus Jr., Sarti & Ferreira Jr. (2017)", j: "Economia e Sociedade", u: "Petrobras: papel público × valor ao acionista", url: "https://scielo.br/j/ecos/a/YpYG6zHrP4VdSByrWfZr7gh/?lang=pt",
+      abnt: "JESUS JÚNIOR, Leonardo Bispo de; SARTI, Fernando; FERREIRA JÚNIOR, Hamilton de Moura. Petrobras, política de conteúdo local e maximização de valor para o acionista: uma sugestão de interpretação. Economia e Sociedade, Campinas, v. 26, n. 2, 2017. DOI: 10.1590/1982-3533.2017v26n2art4." },
+    { r: "p4", a: "Vasarhelyi, Kogan & Tuttle (2015)", j: "Accounting Horizons", u: "Big Data na contabilidade", url: "https://doi.org/10.2308/acch-51071",
+      abnt: "VASARHELYI, Miklos A.; KOGAN, Alexander; TUTTLE, Brad M. Big Data in accounting: an overview. Accounting Horizons, v. 29, n. 2, p. 381-396, 2015. DOI: 10.2308/acch-51071." },
+    { r: "p4", a: "Warren, Moffitt & Byrnes (2015)", j: "Accounting Horizons", u: "Como o Big Data muda a contabilidade", url: "https://scholar.google.com.br/scholar?q=%22How+Big+Data+Will+Change+Accounting%22", check: true,
+      abnt: "WARREN JR., J. Donald; MOFFITT, Kevin C.; BYRNES, Paul. How Big Data will change accounting. Accounting Horizons, v. 29, n. 2, p. 397-407, 2015." },
+    { r: "p4", a: "Appelbaum et al. (2017)", j: "IJAIS", u: "Analytics descritiva, preditiva e prescritiva", url: "https://doi.org/10.1016/j.accinf.2017.03.003",
+      abnt: "APPELBAUM, Deniz; KOGAN, Alexander; VASARHELYI, Miklos; YAN, Zhaokai. Impact of business analytics and enterprise systems on managerial accounting. International Journal of Accounting Information Systems, v. 25, p. 29-44, 2017. DOI: 10.1016/j.accinf.2017.03.003." },
+    { r: "p4", a: "Reginato & Nascimento (2007)", j: "Rev. Contabilidade & Finanças", u: "BI como apoio à controladoria", url: "https://scielo.br/j/rcf/a/9rq9RVXjB6q5wbmFR6TRdvd/",
+      abnt: "REGINATO, Luciane; NASCIMENTO, Auster Moreira. Um estudo de caso envolvendo Business Intelligence como instrumento de apoio à controladoria. Revista Contabilidade & Finanças, São Paulo, v. 18, n. esp., p. 69-83, jun. 2007. DOI: 10.1590/S1519-70772007000300007." },
+    { r: "p4", a: "Araújo, Behr & Schiavi (2023)", j: "Rev. Contabilidade & Finanças", u: "Adoção de business analytics na contabilidade", url: "https://revistas.usp.br/rcf/article/view/220016",
+      abnt: "ARAÚJO, Leticia; BEHR, Ariel; SCHIAVI, Giovana Sordi. Adoção de business analytics na contabilidade. Revista Contabilidade & Finanças, São Paulo, v. 34, n. 93, e1771, 2023. DOI: 10.1590/1808-057x20231771." },
+    { r: "p4", a: "Ferreira & Costa (2017)", j: "REPeC", u: "Big Data em finanças e mercado de capitais", url: "https://www.repec.org.br/repec/article/view/1634",
+      abnt: "FERREIRA, Talieh Shaikhzadeh Vahdat; COSTA, Francisco José da. Big Data: reflexões epistemológicas e impactos nos estudos de finanças e mercado de capitais. Revista de Educação e Pesquisa em Contabilidade, v. 11, n. 4, 2017. DOI: 10.17524/repec.v11i4.1634." },
+    { r: "p4", a: "Boalento & Costa (2025)", j: "Rev. Controladoria e Gestão", u: "BI na contabilidade gerencial (complementar)", url: "https://periodicos.ufs.br/rcg/article/view/21640",
+      abnt: "BOALENTO, Geovana Pimentel; COSTA, Simone Alves da. A influência do Business Intelligence para a contabilidade gerencial na percepção de gestores e controllers. Revista Controladoria e Gestão, v. 6, n. 1, p. 1391-1412, 2025." }
+  ];
+
+  var PORTALS = [
+    ["SciELO", "Artigos revisados por pares, em português", "https://www.scielo.br/"],
+    ["Portal de Periódicos CAPES", "Texto completo grátis pela rede ou login da universidade", "https://www.periodicos.capes.gov.br/"],
+    ["Google Acadêmico", "Use \"Citado por\" para achar artigos mais recentes", "https://scholar.google.com.br/"],
+    ["ABEPRO · anais do ENEGEP", "Congresso da própria Engenharia de Produção", "https://abepro.org.br/biblioteca/"],
+    ["Congresso USP · ANPCONT", "Contabilidade e finanças aplicadas", "https://congressousp.fipecafi.org/"],
+    ["Revista Contabilidade & Finanças", "Também: RAC, RAE, Contabilidade Vista & Revista", "https://www.revistas.usp.br/rcf"]
+  ];
+  var TERMS = ["\"análise econômico-financeira\" Petrobras", "\"indicadores financeiros\" petróleo", "\"termômetro de insolvência\" Kanitz", "\"modelo Fleuriet\" capital de giro", "EBITDA divulgação companhias abertas", "\"business intelligence\" controladoria", "\"big data\" contabilidade"];
+
+  var D = "https://drive.google.com/drive/folders/";
+  var TREE = [
+    [0, "Finanças - Equipe 7", "1miwATCcgIUUVUiJt8YEsb3ZqY1ZbG8j0", "pasta raiz"],
+    [1, "Materiais do professor - Análise de Indicadores", "1vOgqUKzP5sCjh7gxFS1xjHWZq8qCwh17", ""],
+    [2, "Exemplos de Trabalhos anteriores", "1CWUKRRF_ZQ8hztIqOn4n-hBiX3qf84u3", "Pague Menos, Lojas Americanas"],
+    [2, "Livros/Slides", "17dnqG_lNEePVSZeKjbl5OKBNlq7xN7qN", "slides da Unidade 2"],
+    [1, "Nosso Trabalho", "1vE8teA8fFYUYxJgQnB_6VYsMdckRHAeS", ""],
+    [2, "Artigos", "1KHpU1gTIvtJXhCayxLRHZE3ftwtNxyMn", "PDFs que acharem"],
+    [2, "Nosso Relatório - Rasc", "1OvWwocCdenNZYPKUEfSI5Q_P_4Tv1nwC", ""],
+    [3, "Relatório Rasc", "", "texto de todos"]
+  ];
+
+  /* ---------- helpers ---------- */
+  function el(tag, attrs, html) {
+    var e = document.createElement(tag);
+    if (attrs) for (var k in attrs) { if (k === "style") e.style.cssText = attrs[k]; else e.setAttribute(k, attrs[k]); }
+    if (html != null) e.innerHTML = html;
+    return e;
+  }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[c]; }); }
+  var toastT;
+  function toast(msg) { var t = document.getElementById("toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove("on"); }, 1600); }
+  function copy(text) {
+    function fallback() {
+      var ta = el("textarea"); ta.value = text; ta.style.cssText = "position:fixed;opacity:0"; document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); toast("Copiado!"); } catch (e) { toast("Não foi possível copiar"); }
+      ta.remove();
+    }
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(function () { toast("Copiado!"); }, fallback);
+    else fallback();
+  }
+  function progress(id) {
+    var n = ROLES[id].tasks.length, d = 0;
+    for (var i = 0; i < n; i++) if (state.done[id + "-" + i]) d++;
+    return { d: d, n: n, p: Math.round(d / n * 100) };
+  }
+  function ownBadges(list) {
+    if (list.length === 4) return '<span class="own all">Todos</span>';
+    return list.map(function (r) { return '<span class="own" style="background:' + ROLES[r].color + '">' + ROLES[r].n + '</span>'; }).join("");
+  }
+  function artCard(x) {
+    var R = ROLES[x.r];
+    return '<div class="card art" style="border-left-color:' + R.color + '">' +
+      '<div><span class="a">' + esc(x.a) + '</span>' + (x.check ? '<span class="flag">CONFERIR</span>' : '') + ' · <span class="j">' + esc(x.j) + '</span></div>' +
+      '<div class="u">' + esc(x.u) + '</div>' +
+      '<div class="row"><span class="own" style="background:' + R.color + '">' + R.n + '</span>' +
+      '<a href="' + x.url + '" target="_blank" rel="noopener">Abrir ↗</a>' +
+      '<button type="button" data-copy="' + esc(x.abnt) + '">Copiar ABNT</button></div>' +
+      '<details><summary>Ver referência ABNT</summary><p>' + esc(x.abnt) + '</p></details></div>';
+  }
+
+  /* ---------- tabs ---------- */
+  var TABS = [["inicio", "Visão geral"], ["p1", "P1 · Dados"], ["p2", "P2 · Rentabilidade"], ["p3", "P3 · Liquidez"], ["p4", "P4 · Contexto"],
+              ["fontes", "Fontes de dados"], ["artigos", "Artigos"], ["pesquisa", "Onde pesquisar"], ["drive", "Drive"]];
+  var tabsEl = document.getElementById("tabs");
+  TABS.forEach(function (t) {
+    var role = ROLES[t[0]];
+    var b = el("button", { class: "tab", role: "tab", "data-tab": t[0], "aria-selected": "false" },
+      (role ? '<span class="sw" style="background:' + role.color + '"></span>' : '') + t[1] + (role ? ' <span class="pct" data-pct="' + t[0] + '"></span>' : ''));
+    b.addEventListener("click", function () { show(t[0], true); });
+    tabsEl.appendChild(b);
+  });
+  function show(id, push) {
+    if (!document.getElementById(id)) id = "inicio";
+    document.querySelectorAll(".panel").forEach(function (p) { p.classList.toggle("on", p.id === id); });
+    document.querySelectorAll(".tab").forEach(function (b) { b.setAttribute("aria-selected", b.getAttribute("data-tab") === id ? "true" : "false"); });
+    var active = document.querySelector('.tab[data-tab="' + id + '"]'); if (active && active.scrollIntoView) active.scrollIntoView({ block: "nearest", inline: "nearest" });
+    if (push) { try { history.replaceState(null, "", "#" + id); } catch (e) {} window.scrollTo({ top: 0 }); }
+    state.tab = id; save(state);
+  }
+  document.querySelectorAll("[data-go]").forEach(function (b) { b.addEventListener("click", function () { show(b.getAttribute("data-go"), true); }); });
+
+  /* ---------- overview ---------- */
+  var rc = document.getElementById("roleCards");
+  Object.keys(ROLES).forEach(function (id) {
+    var R = ROLES[id];
+    var b = el("button", { class: "rolecard", type: "button" },
+      '<div class="hd" style="background:' + R.color + '"><small>' + R.n + '</small><div>' + R.name + '</div></div>' +
+      '<div class="bd">' + R.pitch + '<div class="bar"><i data-bar="' + id + '" style="background:' + R.color + '"></i></div>' +
+      '<div style="margin-top:6px;font-size:12px" data-barlabel="' + id + '"></div></div>');
+    b.addEventListener("click", function () { show(id, true); });
+    rc.appendChild(b);
+  });
+  var rep = document.getElementById("report");
+  REPORT.forEach(function (r) { rep.appendChild(el("div", { class: "card rs", style: "border-top-color:" + ROLES[r[2]].color }, "<b>" + r[0] + "</b><span>" + r[1] + "</span>")); });
+
+  /* ---------- role panels ---------- */
+  Object.keys(ROLES).forEach(function (id) {
+    var R = ROLES[id], p = document.getElementById(id);
+    var C = 2 * Math.PI * 40;
+    var html = '<div class="rhead" style="background:' + R.color + '"><div><small>' + R.n + '</small><h2>' + R.name + '</h2><p>' + R.pitch + '</p></div>' +
+      '<div class="ring"><svg viewBox="0 0 92 92" width="100%" height="100%"><circle cx="46" cy="46" r="40" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="8"/>' +
+      '<circle cx="46" cy="46" r="40" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-dasharray="' + C + '" stroke-dashoffset="' + C + '" data-ring="' + id + '"/></svg>' +
+      '<span><b data-ringtxt="' + id + '">0%</b><small>concluído</small></span></div></div>';
+    html += '<div class="cols"><div class="card"><div class="taskhead"><h3 style="margin:0">Checklist</h3><button class="reset" data-reset="' + id + '" type="button">Limpar</button></div><div class="tasks">';
+    R.tasks.forEach(function (t, i) {
+      var k = id + "-" + i, on = !!state.done[k];
+      html += '<label class="task' + (on ? ' done' : '') + '"><input type="checkbox" data-k="' + k + '"' + (on ? ' checked' : '') + '><span>' + esc(t[0]) +
+        (t[1] ? ' <a class="lnk" href="' + t[1] + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">abrir ↗</a>' : '') + '</span></label>';
+    });
+    html += '</div></div><div class="side">';
+    html += '<div class="card"><h3>Indicadores</h3><div class="chips">' + R.indicators.map(function (x) { return '<span class="chip" style="background:' + R.soft + ';border-color:transparent;color:' + R.color + '">' + esc(x) + '</span>'; }).join("") + '</div></div>';
+    html += '<div class="card"><h3>Entregas</h3><dl class="kv"><dt>Seções</dt><dd>' + R.sections + '</dd><dt>App</dt><dd>' + R.app + '</dd><dt>Revisa</dt><dd>texto da ' + R.reviews + '</dd></dl></div>';
+    var srcs = SOURCES.filter(function (s) { return s.who.indexOf(id) > -1 && s.url; });
+    html += '<div class="card"><h3>Suas fontes</h3><ul class="list-links">' + srcs.map(function (s) { return '<li><a href="' + s.url + '" target="_blank" rel="noopener">' + esc(s.name) + '</a></li>'; }).join("") + '</ul></div>';
+    var arts = ARTS.filter(function (a) { return a.r === id; });
+    html += '<div class="card"><h3>Suas leituras (' + arts.length + ')</h3><ul class="list-links">' + arts.map(function (a) { return '<li><a href="' + a.url + '" target="_blank" rel="noopener">' + esc(a.a) + '</a>' + (a.check ? '<span class="flag">CONFERIR</span>' : '') + '</li>'; }).join("") +
+      '</ul><div style="margin-top:8px"><button class="reset" type="button" data-artrole="' + id + '">Ver detalhes e ABNT →</button></div></div>';
+    html += '</div></div>';
+    p.innerHTML = html;
+  });
+  document.addEventListener("change", function (e) {
+    var k = e.target.getAttribute && e.target.getAttribute("data-k"); if (!k) return;
+    if (e.target.checked) state.done[k] = true; else delete state.done[k];
+    e.target.closest(".task").classList.toggle("done", e.target.checked);
+    save(state); refresh();
+  });
+  document.addEventListener("click", function (e) {
+    var t = e.target;
+    var r = t.getAttribute && t.getAttribute("data-reset");
+    if (r) { ROLES[r].tasks.forEach(function (_, i) { delete state.done[r + "-" + i]; }); save(state);
+      document.querySelectorAll('#' + r + ' input[type=checkbox]').forEach(function (c) { c.checked = false; c.closest(".task").classList.remove("done"); }); refresh(); toast("Checklist limpo"); }
+    var c = t.getAttribute && t.getAttribute("data-copy"); if (c) copy(c);
+    var ar = t.getAttribute && t.getAttribute("data-artrole"); if (ar) { artFilter = ar; renderArts(); show("artigos", true); }
+  });
+  function refresh() {
+    Object.keys(ROLES).forEach(function (id) {
+      var g = progress(id), C = 2 * Math.PI * 40;
+      var bar = document.querySelector('[data-bar="' + id + '"]'); if (bar) bar.style.width = g.p + "%";
+      var bl = document.querySelector('[data-barlabel="' + id + '"]'); if (bl) bl.textContent = g.d + " de " + g.n + " tarefas";
+      var ring = document.querySelector('[data-ring="' + id + '"]'); if (ring) ring.setAttribute("stroke-dashoffset", C * (1 - g.p / 100));
+      var rt = document.querySelector('[data-ringtxt="' + id + '"]'); if (rt) rt.textContent = g.p + "%";
+      var pc = document.querySelector('[data-pct="' + id + '"]'); if (pc) pc.textContent = g.d ? g.p + "%" : "";
+    });
+  }
+
+  /* ---------- sources ---------- */
+  var srcFilter = "all";
+  function renderSources() {
+    var f = document.getElementById("srcFilters"); f.innerHTML = "";
+    [["all", "Todas"]].concat(Object.keys(ROLES).map(function (id) { return [id, ROLES[id].n]; })).forEach(function (o) {
+      var b = el("button", { class: "fbtn", type: "button", "aria-pressed": srcFilter === o[0] ? "true" : "false" },
+        (ROLES[o[0]] ? '<i class="dot" style="background:' + ROLES[o[0]].color + ';margin:0"></i>' : '') + o[1]);
+      b.addEventListener("click", function () { srcFilter = o[0]; renderSources(); }); f.appendChild(b);
+    });
+    var g = document.getElementById("srcGrid"); g.innerHTML = "";
+    SOURCES.filter(function (s) { return srcFilter === "all" || s.who.indexOf(srcFilter) > -1; }).forEach(function (s) {
+      g.appendChild(el("div", { class: "card src" + (s.main ? " main" : "") },
+        '<div class="top"><span class="name">' + esc(s.name) + '</span>' + (s.main ? '<span class="badge">Principal</span>' : s.warn ? '<span class="badge warn">Só conferir</span>' : '') + '</div>' +
+        '<div class="what">' + esc(s.what) + '</div><div class="owners">' + ownBadges(s.who) + '</div>' +
+        (s.url ? '<a class="go" href="' + s.url + '" target="_blank" rel="noopener">' + esc(s.host) + ' ↗</a>' : '<span class="what">' + esc(s.host) + '</span>')));
+    });
+  }
+
+  /* ---------- articles ---------- */
+  var artFilter = "all", artQuery = "";
+  function renderArts() {
+    var f = document.getElementById("artFilters"); f.innerHTML = "";
+    [["all", "Todos (" + ARTS.length + ")"]].concat(Object.keys(ROLES).map(function (id) { return [id, ROLES[id].n + " (" + ARTS.filter(function (a) { return a.r === id; }).length + ")"]; }))
+      .concat([["check", "Conferir (" + ARTS.filter(function (a) { return a.check; }).length + ")"]]).forEach(function (o) {
+      var b = el("button", { class: "fbtn", type: "button", "aria-pressed": artFilter === o[0] ? "true" : "false" },
+        (ROLES[o[0]] ? '<i class="dot" style="background:' + ROLES[o[0]].color + ';margin:0"></i>' : '') + o[1]);
+      b.addEventListener("click", function () { artFilter = o[0]; renderArts(); }); f.appendChild(b);
+    });
+    var s = el("input", { class: "search", type: "search", placeholder: "Buscar autor ou tema…", "aria-label": "Buscar artigo" });
+    s.value = artQuery;
+    s.addEventListener("input", function () { artQuery = s.value; drawArts(); });
+    f.appendChild(s);
+    drawArts();
+  }
+  function drawArts() {
+    var q = artQuery.trim().toLowerCase();
+    var list = ARTS.filter(function (a) {
+      if (artFilter === "check" && !a.check) return false;
+      if (ROLES[artFilter] && a.r !== artFilter) return false;
+      return !q || (a.a + " " + a.j + " " + a.u + " " + a.abnt).toLowerCase().indexOf(q) > -1;
+    });
+    document.getElementById("artGrid").innerHTML = list.length ? list.map(artCard).join("") : '<div class="empty">Nenhum artigo encontrado.</div>';
+  }
+
+  /* ---------- research ---------- */
+  document.getElementById("portals").innerHTML = PORTALS.map(function (p, i) {
+    return '<a class="card portal" href="' + p[2] + '" target="_blank" rel="noopener"><div class="rk">' + (i + 1) + '</div><div><b>' + esc(p[0]) + ' ↗</b><span>' + esc(p[1]) + '</span></div></a>';
+  }).join("");
+  document.getElementById("terms").innerHTML = TERMS.map(function (t) { return '<button type="button" class="term" data-copy="' + esc(t) + '">' + esc(t) + '</button>'; }).join("");
+
+  /* ---------- drive ---------- */
+  var folder = '<svg class="ic" viewBox="0 0 24 20"><path d="M2 3a2 2 0 0 1 2-2h5l2 2.5h9a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z" fill="#f2c230" stroke="#c99a12" stroke-width="1"/></svg>';
+  var doc = '<svg class="ic" viewBox="0 0 24 20"><rect x="5" y="1" width="14" height="18" rx="2" fill="#4285f4"/><path d="M8 7h8M8 10h8M8 13h5" stroke="#fff" stroke-width="1.4"/></svg>';
+  document.getElementById("tree").innerHTML = TREE.map(function (n) {
+    var cls = n[0] ? " d" + n[0] : "";
+    var inner = (n[2] ? folder : doc) + '<span>' + (n[0] === 0 ? '<b>' + esc(n[1]) + '</b>' : esc(n[1])) + '</span>' + (n[3] ? '<small>' + esc(n[3]) + '</small>' : '');
+    return n[2] ? '<a class="node' + cls + '" href="' + D + n[2] + '" target="_blank" rel="noopener">' + inner + '</a>' : '<div class="node' + cls + '">' + inner + '</div>';
+  }).join("");
+
+  /* ---------- theme ---------- */
+  function applyTheme() { if (state.theme) document.documentElement.setAttribute("data-theme", state.theme); else document.documentElement.removeAttribute("data-theme"); }
+  document.getElementById("themeBtn").addEventListener("click", function () {
+    var dark = state.theme ? state.theme === "dark" : (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches);
+    state.theme = dark ? "light" : "dark"; save(state); applyTheme();
+  });
+
+  /* ---------- init ---------- */
+  applyTheme();
+  renderSources(); renderArts(); refresh();
+  var start = (location.hash || "").slice(1) || state.tab || "inicio";
+  show(start, false);
+  window.addEventListener("hashchange", function () { show(location.hash.slice(1), false); });
+})();
+</script>
+</body>
+</html>
