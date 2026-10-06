@@ -13,13 +13,6 @@
     --p1h: #1d4ed8; --p2h: #047857; --p3h: #b45309; --p4h: #6d28d9;
     --shadow: 0 1px 2px rgba(16,40,30,.06), 0 4px 14px rgba(16,40,30,.06);
   }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #0f1613; --surface: #17201c; --surface-2: #1e2a25; --ink: #e6eee9; --muted: #9aaba3; --line: #2a3832;
-      --brand: #0e4a37; --p1: #7aa2ff; --p1s: #1b2747; --p2: #4fd1a5; --p2s: #133229; --p3: #f0a75a; --p3s: #3a2814; --p4: #b79bff; --p4s: #2a1f45;
-      --warn: #ff9b9b; --warns: #3d1a1a; --note: #2c2814; --note-line: #5a4e1f; --shadow: none;
-    }
-  }
   :root[data-theme="dark"] {
     --bg: #0f1613; --surface: #17201c; --surface-2: #1e2a25; --ink: #e6eee9; --muted: #9aaba3; --line: #2a3832;
     --brand: #0e4a37; --p1: #7aa2ff; --p1s: #1b2747; --p2: #4fd1a5; --p2s: #133229; --p3: #f0a75a; --p3s: #3a2814; --p4: #b79bff; --p4s: #2a1f45;
@@ -65,7 +58,6 @@
   .stat { padding: 14px 16px; }
   .stat b { display: block; font-size: 22px; color: var(--brand); line-height: 1.1; }
   :root[data-theme="dark"] .stat b { color: var(--accent); }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .stat b { color: var(--accent); } }
   .stat span { font-size: 13px; color: var(--muted); }
   .flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1.3fr auto 1fr; gap: 10px; align-items: stretch; }
   .flow .arr { display: flex; align-items: center; color: var(--muted); font-size: 20px; }
@@ -147,7 +139,6 @@
   .owners { display: flex; gap: 4px; flex-wrap: wrap; }
   .own { font-size: 11px; font-weight: 700; color: #fff; border-radius: 5px; padding: 1px 6px; }
   :root[data-theme="dark"] .own { color: #0f1613; }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .own { color: #0f1613; } }
   .own.all { background: var(--muted); }
 
   /* ARTICLES */
@@ -713,7 +704,7 @@
   /* ---------- theme ---------- */
   function applyTheme() { if (state.theme) document.documentElement.setAttribute("data-theme", state.theme); else document.documentElement.removeAttribute("data-theme"); }
   document.getElementById("themeBtn").addEventListener("click", function () {
-    var dark = state.theme ? state.theme === "dark" : (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches);
+    var dark = state.theme === "dark";
     state.theme = dark ? "light" : "dark"; save(state); applyTheme();
   });
 
