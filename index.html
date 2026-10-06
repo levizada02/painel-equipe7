@@ -10,6 +10,7 @@
     --brand: #0b3d2e; --brand-ink: #ffffff; --accent: #f2c230; --accent-ink: #0b3d2e;
     --p1: #1d4ed8; --p1s: #e8eefc; --p2: #047857; --p2s: #e3f4ee; --p3: #b45309; --p3s: #fbf0e3; --p4: #6d28d9; --p4s: #efe8fb;
     --warn: #9b1c1c; --warns: #fde2e2; --note: #fff7dc; --note-line: #f0d98a;
+    --p1h: #1d4ed8; --p2h: #047857; --p3h: #b45309; --p4h: #6d28d9;
     --shadow: 0 1px 2px rgba(16,40,30,.06), 0 4px 14px rgba(16,40,30,.06);
   }
   @media (prefers-color-scheme: dark) {
@@ -359,7 +360,7 @@
 
   /* ---------- data ---------- */
   var ROLES = {
-    p1: { n: "P1", name: "Dados & Balanço", color: "var(--p1)", soft: "var(--p1s)",
+    p1: { n: "P1", name: "Dados & Balanço", color: "var(--p1)", hd: "var(--p1h)", soft: "var(--p1s)",
       pitch: "Constrói a base de dados que todo mundo usa e cuida da análise do Balanço e da estrutura do app.",
       sections: "3 Metodologia · 4 Balanço · 8 Painel", app: "Página Balanço + esqueleto do app", reviews: "P2",
       indicators: ["AV/AH do Balanço", "Ativo, Passivo e PL corrigidos"],
@@ -377,7 +378,7 @@
         ["Revisar o texto da P2"],
         ["Montar os slides da sua parte"]
       ] },
-    p2: { n: "P2", name: "Resultado & Rentabilidade", color: "var(--p2)", soft: "var(--p2s)",
+    p2: { n: "P2", name: "Resultado & Rentabilidade", color: "var(--p2)", hd: "var(--p2h)", soft: "var(--p2s)",
       pitch: "Analisa a DRE e a rentabilidade e liga os resultados ao preço do petróleo, câmbio e juros (a parte Big Data).",
       sections: "5 DRE · 6.4 Rentabilidade · 7 Big Data", app: "Páginas DRE e Rentabilidade", reviews: "P3",
       indicators: ["Margem bruta", "Margem operacional", "Margem líquida", "Margem EBITDA", "Giro do ativo", "ROA", "ROE", "DuPont"],
@@ -395,7 +396,7 @@
         ["Revisar o texto da P3"],
         ["Montar os slides da sua parte"]
       ] },
-    p3: { n: "P3", name: "Liquidez, Estrutura & Giro", color: "var(--p3)", soft: "var(--p3s)",
+    p3: { n: "P3", name: "Liquidez, Estrutura & Giro", color: "var(--p3)", hd: "var(--p3h)", soft: "var(--p3s)",
       pitch: "Mede a saúde financeira de curto e longo prazo e compara a Petrobras com outras petroleiras.",
       sections: "6.1 Liquidez · 6.2 Estrutura · 6.3 Giro", app: "Página Liquidez e Estrutura", reviews: "P4",
       indicators: ["Liquidez corrente", "Seca", "Imediata", "Geral", "Capital de terceiros", "Composição do endividamento", "Dívida Líq./EBITDA", "Prazos médios", "Ciclos", "CCL e NCG"],
@@ -412,7 +413,7 @@
         ["Revisar o texto da P4"],
         ["Montar os slides da sua parte"]
       ] },
-    p4: { n: "P4", name: "Contexto, Valor & Edição", color: "var(--p4)", soft: "var(--p4s)",
+    p4: { n: "P4", name: "Contexto, Valor & Edição", color: "var(--p4)", hd: "var(--p4h)", soft: "var(--p4s)",
       pitch: "Escreve a abertura e a base teórica, calcula os indicadores de valor e fecha o trabalho como editor final.",
       sections: "1 · 2 · 6.5 · 9 Conclusão · 10 Referências", app: "Home (resumo dos KPIs)", reviews: "P1",
       indicators: ["Crescimento de vendas", "Riqueza/empregado (DVA)", "Payout", "Dividendos", "GVA"],
@@ -591,7 +592,7 @@
   Object.keys(ROLES).forEach(function (id) {
     var R = ROLES[id];
     var b = el("button", { class: "rolecard", type: "button" },
-      '<div class="hd" style="background:' + R.color + '"><small>' + R.n + '</small><div>' + R.name + '</div></div>' +
+      '<div class="hd" style="background:' + R.hd + '"><small>' + R.n + '</small><div>' + R.name + '</div></div>' +
       '<div class="bd">' + R.pitch + '<div class="bar"><i data-bar="' + id + '" style="background:' + R.color + '"></i></div>' +
       '<div style="margin-top:6px;font-size:12px" data-barlabel="' + id + '"></div></div>');
     b.addEventListener("click", function () { show(id, true); });
@@ -604,7 +605,7 @@
   Object.keys(ROLES).forEach(function (id) {
     var R = ROLES[id], p = document.getElementById(id);
     var C = 2 * Math.PI * 40;
-    var html = '<div class="rhead" style="background:' + R.color + '"><div><small>' + R.n + '</small><h2>' + R.name + '</h2><p>' + R.pitch + '</p></div>' +
+    var html = '<div class="rhead" style="background:' + R.hd + '"><div><small>' + R.n + '</small><h2>' + R.name + '</h2><p>' + R.pitch + '</p></div>' +
       '<div class="ring"><svg viewBox="0 0 92 92" width="100%" height="100%"><circle cx="46" cy="46" r="40" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="8"/>' +
       '<circle cx="46" cy="46" r="40" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-dasharray="' + C + '" stroke-dashoffset="' + C + '" data-ring="' + id + '"/></svg>' +
       '<span><b data-ringtxt="' + id + '">0%</b><small>concluído</small></span></div></div>';
